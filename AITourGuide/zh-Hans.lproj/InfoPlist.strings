@@ -1,0 +1,5 @@
+"CFBundleDisplayName" = "我在旅途-玩乐";
+"NSCameraUsageDescription" = "拍摄景点或展品，生成讲解。";
+"NSLocationWhenInUseUsageDescription" = "推荐附近值得参观的地点。";
+"NSMicrophoneUsageDescription" = "录入对导游的语音提问。";
+"NSSpeechRecognitionUsageDescription" = "将口述问题转成可编辑文字。";

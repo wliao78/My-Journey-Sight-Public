@@ -1,0 +1,5 @@
+"CFBundleDisplayName" = "My Journey Sight";
+"NSCameraUsageDescription" = "Capture places or objects for AI-guided explanations.";
+"NSLocationWhenInUseUsageDescription" = "Recommend interesting places near you.";
+"NSMicrophoneUsageDescription" = "Record spoken questions for your guide.";
+"NSSpeechRecognitionUsageDescription" = "Turn spoken questions into editable text.";
