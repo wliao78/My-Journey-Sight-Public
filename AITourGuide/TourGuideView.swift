@@ -137,7 +137,7 @@ struct TourGuideView: View {
             statusHeader
             Picker("出行方式", selection: $travelMode) {
                 ForEach(GuideTravelMode.allCases) { mode in
-                    Text(mode.rawValue).tag(mode)
+                    Text(LocalizedStringKey(mode.rawValue)).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
@@ -288,7 +288,7 @@ struct TourGuideView: View {
                     }
                     if attractions.isEmpty && !photoIsSubmitted && subject.isEmpty {
                         Button("使用示例场景体验") {
-                            subject = "博物馆展品示例"
+                            subject = String(localized: "博物馆展品示例")
                             beginExplanation()
                         }
                     }
@@ -341,7 +341,7 @@ struct TourGuideView: View {
             }
             Picker("讲解长度", selection: $length) {
                 ForEach(GuideLength.allCases) { option in
-                    Text(option.rawValue).tag(option)
+                    Text(LocalizedStringKey(option.rawValue)).tag(option)
                 }
             }
             .pickerStyle(.segmented)

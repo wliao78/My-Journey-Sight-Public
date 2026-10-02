@@ -18,3 +18,12 @@ enum PublicAIProvider: String, CaseIterable, Identifiable {
         Self(rawValue: UserDefaults.standard.string(forKey: "publicAIProvider") ?? "openai") ?? .openAI
     }
 }
+
+enum PublicAIConsent {
+    static var granted: Bool {
+        UserDefaults.standard.bool(forKey: "publicAIConsent.\(PublicAIProvider.selected.rawValue)")
+    }
+    static func set(_ granted: Bool) {
+        UserDefaults.standard.set(granted, forKey: "publicAIConsent.\(PublicAIProvider.selected.rawValue)")
+    }
+}

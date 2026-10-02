@@ -6,8 +6,9 @@ final class GuideSpeechPlaybackService: NSObject, ObservableObject, AVSpeechSynt
     @Published private(set) var speakingMessageID: UUID?
 
     static var chineseVoices: [AVSpeechSynthesisVoice] {
-        AVSpeechSynthesisVoice.speechVoices()
-            .filter { $0.language.hasPrefix("zh") }
+        let language = Locale.current.language.languageCode?.identifier ?? "en"
+        return AVSpeechSynthesisVoice.speechVoices()
+            .filter { $0.language.hasPrefix(language) }
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
@@ -38,12 +39,13 @@ final class GuideSpeechPlaybackService: NSObject, ObservableObject, AVSpeechSynt
             return name.contains("tingting") || name.contains("yushu") || name.contains("meijia")
         }
         let selectedIdentifier = UserDefaults.standard.string(forKey: "guideVoiceIdentifier") ?? ""
+        let language = Locale.current.language.languageCode?.identifier ?? "en"
         utterance.voice = AVSpeechSynthesisVoice(identifier: selectedIdentifier)
             ?? preferredVoices.sorted {
                 if $0.quality != $1.quality { return $0.quality.rawValue > $1.quality.rawValue }
-                return $0.language == "zh-CN" && $1.language != "zh-CN"
+                return $0.language.hasPrefix(language) && !$1.language.hasPrefix(language)
             }.first
-            ?? AVSpeechSynthesisVoice(language: "zh-CN")
+            ?? AVSpeechSynthesisVoice(language: Locale.current.identifier)
         utterance.rate = 0.53
         utterance.pitchMultiplier = 1.02
         utterance.postUtteranceDelay = 0

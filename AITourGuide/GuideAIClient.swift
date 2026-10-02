@@ -5,9 +5,9 @@ enum GuideAIError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingKey: "请先在设置中填写所选服务商的 API Key。"
-        case .invalidResponse: "AI 回复无法读取，请重试。"
-        case .http(let code): "AI 连接失败（\(code)），请检查密钥或网络。"
+        case .missingKey: String(localized: "请先在设置中填写所选服务商的 API Key。")
+        case .invalidResponse: String(localized: "AI 回复无法读取，请重试。")
+        case .http(let code): String(format: NSLocalizedString("AI 连接失败（%lld），请检查密钥或网络。", comment: "AI HTTP error"), code)
         }
     }
 }
@@ -17,7 +17,9 @@ struct GuideAIClient {
     private let model = "gpt-6-luna"
 
     func testConnection() async throws {
-        _ = try await complete(instructions: "Reply briefly.", input: "ping")
+        _ = try await send(body: ["model": model, "store": false,
+                                  "max_output_tokens": 20, "instructions": "Reply briefly.",
+                                  "input": "ping"], keyVerification: true)
     }
 
     func complete(instructions: String, input: String) async throws -> String {
@@ -46,9 +48,16 @@ struct GuideAIClient {
         ])
     }
 
-    private func send(body: [String: Any]) async throws -> String {
+    private func send(body: [String: Any], keyVerification: Bool = false) async throws -> String {
         let provider = PublicAIProvider.selected
         guard let key = APIKeyStore(provider: provider).load() else { throw GuideAIError.missingKey }
+        guard keyVerification || PublicAIConsent.granted else {
+            throw NSError(domain: "AIConsent", code: 1, userInfo: [NSLocalizedDescriptionKey:
+                String(localized: "请先在设置中同意向所选 AI 服务商发送资料。")])
+        }
+        var body = body
+        body["instructions"] = (body["instructions"] as? String ?? "") +
+            (Locale.current.language.languageCode?.identifier == "zh" ? "\n请用中文回答。" : "\nPlease respond in natural English.")
         if provider != .openAI {
             return try await sendAlternative(body: body, provider: provider, key: key)
         }

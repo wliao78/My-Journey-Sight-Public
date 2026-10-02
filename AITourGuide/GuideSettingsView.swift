@@ -8,6 +8,7 @@ struct GuideSettingsView: View {
     @State private var key = ""
     @State private var status = ""
     @State private var testing = false
+    @State private var aiConsent = PublicAIConsent.granted
 
     var body: some View {
         NavigationStack {
@@ -21,7 +22,7 @@ struct GuideSettingsView: View {
                     }
                     Button(voicePreview.speakingMessageID == nil ? "试听声音" : "停止试听") {
                         if voicePreview.speakingMessageID == nil {
-                            voicePreview.toggle(message: GuideMessage(isUser: false, text: "欢迎来到这里。接下来，我们一起听听这座城市的故事。"))
+                            voicePreview.toggle(message: GuideMessage(isUser: false, text: String(localized: "欢迎来到这里。接下来，我们一起听听这座城市的故事。")))
                         } else {
                             voicePreview.stop()
                         }
@@ -37,12 +38,14 @@ struct GuideSettingsView: View {
                             Text(provider.title).tag(provider.rawValue)
                         }
                     }
+                    .onChange(of: providerID) { _, _ in aiConsent = PublicAIConsent.granted }
                     SecureField("在此粘贴 API Key", text: $key)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                     Button("保存") {
-                        status = APIKeyStore(provider: selectedProvider).save(key) ? "已安全保存在此设备钥匙串。" : "保存失败。"
-                        if status.hasPrefix("已安全") { key = "" }
+                        let didSave = APIKeyStore(provider: selectedProvider).save(key)
+                        status = didSave ? String(localized: "已安全保存在此设备钥匙串。") : String(localized: "保存失败。")
+                        if didSave { key = "" }
                     }
                     .disabled(key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .buttonStyle(.borderedProminent)
@@ -51,7 +54,7 @@ struct GuideSettingsView: View {
                         Task {
                             do {
                                 try await GuideAIClient().testConnection()
-                                status = "连接成功。返回首页即可获取 AI 推荐。"
+                                status = String(localized: "连接成功。返回首页即可获取 AI 推荐。")
                             } catch { status = error.localizedDescription }
                             testing = false
                         }
@@ -60,8 +63,12 @@ struct GuideSettingsView: View {
                     .buttonStyle(.bordered)
                     Button("删除已保存的密钥", role: .destructive) {
                         APIKeyStore(provider: selectedProvider).clear()
-                        status = "密钥已删除。"
+                        status = String(localized: "密钥已删除。")
                     }
+                    Toggle("同意向所选 AI 服务商发送资料", isOn: $aiConsent)
+                        .onChange(of: aiConsent) { _, value in PublicAIConsent.set(value) }
+                    Text("使用 AI 时，输入文字、照片、位置及相关地点信息会发送给所选服务商。可随时关闭；关闭后仍可浏览演示内容。")
+                        .font(.footnote)
                 }
                 .listRowBackground(SightTheme.panel)
                 Section {
