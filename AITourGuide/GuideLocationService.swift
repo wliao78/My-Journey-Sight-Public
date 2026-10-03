@@ -4,8 +4,8 @@ import Foundation
 @MainActor
 final class GuideLocationService: NSObject, ObservableObject, @preconcurrency CLLocationManagerDelegate {
     @Published private(set) var location: CLLocation?
-    @Published private(set) var placeName = "正在定位…"
-    @Published private(set) var message = "正在定位…"
+    @Published private(set) var placeName = String(localized: "正在定位…")
+    @Published private(set) var message = String(localized: "正在定位…")
 
     private let manager = CLLocationManager()
     private let geocoder = CLGeocoder()
@@ -21,8 +21,8 @@ final class GuideLocationService: NSObject, ObservableObject, @preconcurrency CL
         switch manager.authorizationStatus {
         case .notDetermined: manager.requestWhenInUseAuthorization()
         case .authorizedAlways, .authorizedWhenInUse: manager.startUpdatingLocation()
-        case .denied, .restricted: message = "定位未开启；请在系统设置中允许此 App 使用位置。"
-        @unknown default: message = "暂时无法获取位置。"
+        case .denied, .restricted: message = String(localized: "定位未开启；请在系统设置中允许此 App 使用位置。")
+        @unknown default: message = String(localized: "暂时无法获取位置。")
         }
     }
 
@@ -39,22 +39,22 @@ final class GuideLocationService: NSObject, ObservableObject, @preconcurrency CL
         guard let latest = locations.last else { return }
         manager.stopUpdatingLocation()
         location = latest
-        message = "已获取当前位置"
+        message = String(localized: "已获取当前位置")
         Task {
             let placemark = try? await geocoder.reverseGeocodeLocation(latest).first
-            placeName = placemark?.locality ?? placemark?.subLocality ?? placemark?.name ?? "当前位置"
+            placeName = placemark?.locality ?? placemark?.subLocality ?? placemark?.name ?? String(localized: "当前位置")
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         if (error as? CLError)?.code == .locationUnknown {
             #if targetEnvironment(simulator)
-            message = "模拟器尚未提供位置；请在 Xcode 的“模拟位置”中选择测试城市，再点右上角刷新。"
+            message = String(localized: "模拟器尚未提供位置；请在 Xcode 的“模拟位置”中选择测试城市，再点右上角刷新。")
             #else
-            message = "正在等待设备提供位置…"
+            message = String(localized: "正在等待设备提供位置…")
             #endif
             return
         }
-        message = "定位失败：\(error.localizedDescription)"
+        message = String(format: NSLocalizedString("定位失败：%@", comment: ""), String(describing: PublicLanguage.errorDescription(error)))
     }
 }

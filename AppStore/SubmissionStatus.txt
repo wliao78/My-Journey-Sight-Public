@@ -1,0 +1,11 @@
+Version: 1.0 (2)
+Apple app ID: 6818730266
+Status verified on 2026-10-03: Waiting for Review
+Submission ID: ae18d5f3-73ad-45aa-8d87-bfc7a2a0b612
+English store name: My Journey Sight
+Simplified Chinese store name: 我在旅途-玩乐
+Pricing: Free
+Availability: All 175 countries or regions, subject to Apple and local requirements
+Release: Automatically after App Review approval
+Store descriptions and screenshots: English (U.S.) and Simplified Chinese
+Note: Submitted for review; not yet approved or released.

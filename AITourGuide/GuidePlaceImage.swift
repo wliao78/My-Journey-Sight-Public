@@ -8,26 +8,40 @@ struct GuidePlaceImage: View {
     var body: some View {
         Group {
             if PublicDemo.enabled {
-                ZStack {
-                    LinearGradient(colors: [.teal.opacity(0.4), .blue.opacity(0.25)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    Image(systemName: "building.columns").font(.system(size: 64, weight: .light)).foregroundStyle(.white.opacity(0.85))
+                GeometryReader { geometry in
+                Image("DemoIllustration")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .overlay(alignment: .bottomTrailing) {
+                        Text(String(localized: "示意图"))
+                            .font(.caption2)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8).padding(.vertical, 4)
+                            .background(.black.opacity(0.55), in: Capsule())
+                            .padding(8)
+                    }
+                    .accessibilityLabel(String(localized: "离线演示示意图"))
                 }
             } else if let snapshot {
                 Image(uiImage: snapshot)
                     .resizable()
                     .scaledToFill()
-                    .accessibilityLabel("景点实景预览")
+                    .accessibilityLabel(String(localized: "景点实景预览"))
             } else {
                 Map(initialPosition: .region(MKCoordinateRegion(
                     center: item.placemark.coordinate,
                     latitudinalMeters: 1_200,
                     longitudinalMeters: 1_200
                 ))) {
-                    Marker(item.name ?? "景点", coordinate: item.placemark.coordinate)
+                    Marker(item.name ?? String(localized: "景点"), coordinate: item.placemark.coordinate)
                 }
                 .mapControlVisibility(.hidden)
                 .allowsHitTesting(false)
-                .accessibilityLabel("景点地图预览")
+                .accessibilityLabel(String(localized: "景点地图预览"))
             }
         }
         .task(id: "\(item.placemark.coordinate.latitude)|\(item.placemark.coordinate.longitude)") {

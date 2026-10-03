@@ -28,7 +28,7 @@ struct TourGuideView: View {
     @State private var recommendationsByMode: [GuideTravelMode: [GuideAttraction]] = [:]
     @State private var searchQueriesByMode: [GuideTravelMode: String] = [:]
     @State private var didAutoRecommend = false
-    @State private var attractionStatus = "正在定位…"
+    @State private var attractionStatus = String(localized: "正在定位…")
     @State private var loadingAttractions = false
     @State private var isAtAttractionListBottom = false
     @State private var attractionRequestID = UUID()
@@ -89,13 +89,13 @@ struct TourGuideView: View {
                     showingCamera = false
                 }
             }
-            .alert("照片未能读取", isPresented: Binding(
+            .alert(String(localized: "照片未能读取"), isPresented: Binding(
                 get: { photoError != nil },
                 set: { if !$0 { photoError = nil } }
             )) {
-                Button("确定") { photoError = nil }
+                Button(String(localized: "确定")) { photoError = nil }
             } message: {
-                Text(photoError ?? "请重新选择照片。")
+                Text(photoError ?? String(localized: "请重新选择照片。"))
             }
             .navigationDestination(for: String.self) { id in
                 if let attraction = attractions.first(where: { $0.id == id }) {
@@ -130,7 +130,7 @@ struct TourGuideView: View {
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
-                Button("完成") { isQuestionFocused = false }
+                Button(String(localized: "完成")) { isQuestionFocused = false }
             }
         }
     }
@@ -138,7 +138,7 @@ struct TourGuideView: View {
     private var mainScreen: some View {
         VStack(spacing: 0) {
             statusHeader
-            Picker("出行方式", selection: $travelMode) {
+            Picker(String(localized: "出行方式"), selection: $travelMode) {
                 ForEach(GuideTravelMode.allCases) { mode in
                     Text(LocalizedStringKey(mode.rawValue)).tag(mode)
                 }
@@ -163,7 +163,7 @@ struct TourGuideView: View {
     private var statusHeader: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                Text("我的旅程 — 玩乐")
+                Text(String(localized: "我的旅程 — 玩乐"))
                     .font(.system(size: 25, weight: .bold, design: .rounded))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -175,7 +175,7 @@ struct TourGuideView: View {
                         .frame(width: 30, height: 30)
                         .background(.white.opacity(0.13), in: Circle())
                 }
-                .accessibilityLabel("设置")
+                .accessibilityLabel(String(localized: "设置"))
             }
             HStack(spacing: 8) {
                 Image(systemName: "location.fill")
@@ -196,12 +196,12 @@ struct TourGuideView: View {
                 } label: {
                     Image(systemName: "arrow.clockwise")
                 }
-                .accessibilityLabel("刷新位置和天气")
+                .accessibilityLabel(String(localized: "刷新位置和天气"))
                 if !subject.isEmpty {
                     Button { reset() } label: {
                         Image(systemName: "arrow.uturn.backward")
                     }
-                    .accessibilityLabel("重置讲解")
+                    .accessibilityLabel(String(localized: "重置讲解"))
                 }
             }
         }
@@ -231,19 +231,19 @@ struct TourGuideView: View {
                     if UIImagePickerController.isSourceTypeAvailable(.camera) {
                         showingCamera = true
                     } else {
-                        photoError = "模拟器没有相机；请用旁边的相册按钮选择照片。"
+                        photoError = String(localized: "模拟器没有相机；请用旁边的相册按钮选择照片。")
                     }
                 } label: {
                     Image(systemName: "camera.fill")
                         .font(.title3)
                 }
-                .accessibilityLabel("拍照")
+                .accessibilityLabel(String(localized: "拍照"))
                 PhotosPicker(selection: $selectedPhoto, matching: .images) {
                     Image(systemName: "photo.on.rectangle")
                         .font(.title3)
                 }
-                .accessibilityLabel("从相册选择")
-                TextField(subject.isEmpty ? "搜索附近景点" : "想问什么？", text: $question, axis: .vertical)
+                .accessibilityLabel(String(localized: "从相册选择"))
+                TextField(subject.isEmpty ? String(localized: "搜索附近景点") : String(localized: "想问什么？"), text: $question, axis: .vertical)
                     .lineLimit(1...3)
                     .textFieldStyle(.plain)
                     .focused($isQuestionFocused)
@@ -256,12 +256,12 @@ struct TourGuideView: View {
                         .font(.title3)
                         .foregroundStyle(speech.isListening ? .red : SightTheme.accent)
                 }
-                .accessibilityLabel(speech.isListening ? "停止语音输入" : "开始语音输入")
+                .accessibilityLabel(speech.isListening ? String(localized: "停止语音输入") : String(localized: "开始语音输入"))
                 Button(action: sendQuestion) {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.title2)
                 }
-                .accessibilityLabel("发送文字")
+                .accessibilityLabel(String(localized: "发送文字"))
                 .disabled(question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
             .buttonStyle(.plain)
@@ -284,21 +284,21 @@ struct TourGuideView: View {
                     }
                     attractionPanel
                     if !attractions.isEmpty && subject.isEmpty && photoData == nil {
-                        Text("已到最后一条 · 继续上拉刷新")
+                        Text(String(localized: "已到最后一条 · 继续上拉刷新"))
                             .font(.footnote)
                             .foregroundStyle(SightTheme.secondary)
                             .frame(maxWidth: .infinity)
                             .padding(.bottom, 8)
                     }
                     if attractions.isEmpty && !photoIsSubmitted && subject.isEmpty {
-                        Button("使用示例场景体验") {
+                        Button(String(localized: "使用示例场景体验")) {
                             subject = String(localized: "博物馆展品示例")
                             beginExplanation()
                         }
                     }
                 }
                 .padding()
-            }
+            }.defaultScrollAnchor(PublicLanguage.qaScrollBottom ? .bottom : .top)
             .onScrollGeometryChange(for: Bool.self) { geometry in
                 let remaining = geometry.contentSize.height - geometry.contentOffset.y - geometry.containerSize.height
                 return remaining <= 12
@@ -328,22 +328,22 @@ struct TourGuideView: View {
         VStack(alignment: .leading, spacing: 14) {
             if photoIsSubmitted {
                 HStack {
-                    Text("照片讲解").font(.title2.bold())
+                    Text(String(localized: "照片讲解")).font(.title2.bold())
                     Spacer()
                     if let narration = messages.last(where: {
-                        !$0.isUser && !$0.text.hasPrefix("正在识别") && !$0.text.hasPrefix("照片讲解暂不可用")
+                        !$0.isUser && !$0.text.hasPrefix(String(localized: "正在识别照片…")) && !$0.text.hasPrefix(String(localized: "照片讲解暂不可用"))
                     }) {
                         Button {
                             photoPlayback.toggle(message: narration)
                         } label: {
-                            Label(photoPlayback.speakingMessageID == narration.id ? "停止播放" : "播放讲解",
+                            Label(photoPlayback.speakingMessageID == narration.id ? String(localized: "停止播放") : String(localized: "播放讲解"),
                                   systemImage: photoPlayback.speakingMessageID == narration.id ? "stop.circle.fill" : "speaker.wave.2.fill")
                         }
                         .buttonStyle(.bordered)
                     }
                 }
             }
-            Picker("讲解长度", selection: $length) {
+            Picker(String(localized: "讲解长度"), selection: $length) {
                 ForEach(GuideLength.allCases) { option in
                     Text(LocalizedStringKey(option.rawValue)).tag(option)
                 }
@@ -375,34 +375,34 @@ struct TourGuideView: View {
     private var attractionPanel: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Label("附近值得看", systemImage: "mappin.and.ellipse")
+                Label(String(localized: "附近值得看"), systemImage: "mappin.and.ellipse")
                     .font(.title3.bold())
                 Spacer()
                 if loadingAttractions {
                     ProgressView()
                         .controlSize(.small)
-                        .accessibilityLabel("正在更新景点推荐")
+                        .accessibilityLabel(String(localized: "正在更新景点推荐"))
                 }
-                Button("刷新", systemImage: "arrow.clockwise") {
+                Button(String(localized: "刷新"), systemImage: "arrow.clockwise") {
                     Task { await refreshAttractions(force: true) }
                 }
                 .disabled(loadingAttractions || locationService.location == nil)
             }
             if loadingAttractions && attractions.isEmpty {
-                ProgressView("正在查找并筛选景点…")
+                ProgressView(String(localized: "正在查找并筛选景点…"))
             } else if attractions.isEmpty {
                 if APIKeyStore().load() == nil {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("先设置 API Key，才能获取附近景点推荐。")
+                        Text(String(localized: "先设置 API Key，才能获取附近景点推荐。"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Button("设置 API Key", systemImage: "key.fill") {
+                        Button(String(localized: "设置 API Key"), systemImage: "key.fill") {
                             showingSettings = true
                         }
                         .buttonStyle(.borderedProminent)
                     }
                 } else {
-                    Text(attractionStatus == "正在定位…" ? locationService.message : attractionStatus)
+                    Text(attractionStatus == String(localized: "正在定位…") ? locationService.message : attractionStatus)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -419,7 +419,7 @@ struct TourGuideView: View {
                                     .font(.headline)
                                     .lineLimit(1)
                                 Spacer()
-                                Text(PublicDemo.enabled ? PublicDemo.title : "\(Int(attraction.distance)) 米")
+                                Text(PublicDemo.enabled ? PublicDemo.title : String(format: NSLocalizedString("%@ 米", comment: ""), String(describing: Int(attraction.distance))))
                                     .font(.caption.bold())
                                     .foregroundStyle(.secondary)
                             }
@@ -427,7 +427,7 @@ struct TourGuideView: View {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(2)
-                            Text("值得知道：\(attraction.highlight)")
+                            Text(String(format: NSLocalizedString("值得知道：%@", comment: ""), String(describing: attraction.highlight)))
                                 .font(.subheadline)
                                 .lineLimit(3)
                         }
@@ -459,7 +459,7 @@ struct TourGuideView: View {
         }
         guard !loadingAttractions, let location = locationService.location else { return }
         guard APIKeyStore().load() != nil else {
-            attractionStatus = "请先在设置中填写 API Key。"
+            attractionStatus = String(localized: "请先在设置中填写 API Key。")
             return
         }
         let requestedMode = travelMode
@@ -475,7 +475,7 @@ struct TourGuideView: View {
             guard attractionRequestID == requestID, loadingAttractions else { return }
             attractionRequestID = UUID()
             loadingAttractions = false
-            attractionStatus = "查找景点超时，请点刷新重试。"
+            attractionStatus = String(localized: "查找景点超时，请点刷新重试。")
         }
         defer {
             if attractionRequestID == requestID {
@@ -493,10 +493,10 @@ struct TourGuideView: View {
             if travelMode == requestedMode {
                 attractions = updated
             }
-            attractionStatus = updated.isEmpty ? "附近暂未找到符合要求的景点，可尝试换个说法或切换开车。" : ""
+            attractionStatus = updated.isEmpty ? String(localized: "附近暂未找到符合要求的景点，可尝试换个说法或切换开车。") : ""
         } catch {
             guard attractionRequestID == requestID else { return }
-            attractionStatus = "推荐暂不可用：\(error.localizedDescription)"
+            attractionStatus = String(format: NSLocalizedString("推荐暂不可用：%@", comment: ""), String(describing: PublicLanguage.errorDescription(error)))
         }
     }
 
@@ -506,17 +506,17 @@ struct TourGuideView: View {
             messages = [GuideMessage(isUser: false, text: PublicDemo.notice + "\n" + attraction.highlight)]
             return
         }
-        messages = [GuideMessage(isUser: false, text: "正在准备讲解…")]
+        messages = [GuideMessage(isUser: false, text: String(localized: "正在准备讲解…"))]
         do {
             let output = try await GuideAIClient().complete(
-                instructions: "你是中文现场导游，说话自然、简洁，只讲这个地点独有、最值得游客知道的内容和一个具体观察点。开头直接讲重点，不重复地点名称或地址，不寒暄，不自称 AI，不说套话，不罗列泛泛建议，不加追问句。禁止‘城市日常’‘周边氛围’‘文化交融’等空泛词句。短档最多 70 字，2 分钟档最多 180 字，深度档最多 350 字。只根据提供的资料写；未经核验的历史年代、人物、馆藏、开放时间不得编造。如果提供的特色不够具体，就只说‘目前没有可靠的特色资料’，不要用废话填充。",
+                instructions: "你是谨慎的现场导游，说话自然、简洁，只讲这个地点独有、最值得游客知道的内容和一个具体观察点。开头直接讲重点，不重复地点名称或地址，不寒暄，不自称 AI，不说套话，不罗列泛泛建议，不加追问句。禁止‘城市日常’‘周边氛围’‘文化交融’等空泛词句。短档最多 70 字，2 分钟档最多 180 字，深度档最多 350 字。只根据提供的资料写；未经核验的历史年代、人物、馆藏、开放时间不得编造。如果提供的特色不够具体，就只说‘目前没有可靠的特色资料’，不要用废话填充。",
                 input: "景点：\(attraction.name)；类别：\(attraction.item.pointOfInterestCategory?.rawValue ?? "未知")；地址：\(attraction.address)；值得知道：\(attraction.highlight)；讲解长度：\(length.rawValue)。"
             )
             guard selectedAttraction?.id == attraction.id else { return }
             messages = [GuideMessage(isUser: false, text: output)]
         } catch {
             guard selectedAttraction?.id == attraction.id else { return }
-            messages = [GuideMessage(isUser: false, text: "讲解暂不可用：\(error.localizedDescription)")]
+            messages = [GuideMessage(isUser: false, text: String(format: NSLocalizedString("讲解暂不可用：%@", comment: ""), String(describing: PublicLanguage.errorDescription(error))))]
         }
     }
 
@@ -528,7 +528,7 @@ struct TourGuideView: View {
                     .scaledToFit()
                     .frame(maxWidth: .infinity)
                     .frame(maxHeight: 260)
-                    .accessibilityLabel("选中的照片")
+                    .accessibilityLabel(String(localized: "选中的照片"))
             } else {
                 Image(systemName: "camera.viewfinder")
                     .font(.system(size: 56))
@@ -537,15 +537,15 @@ struct TourGuideView: View {
                     .foregroundStyle(.secondary)
             }
             HStack {
-                Text(photoIsSubmitted ? "已提交的照片" : "待提交的照片")
+                Text(photoIsSubmitted ? String(localized: "已提交的照片") : String(localized: "待提交的照片"))
                     .font(.title2.bold())
                 Spacer()
                 if !photoIsSubmitted {
-                    Button("提交", systemImage: "arrow.up.circle.fill") {
+                    Button(String(localized: "提交"), systemImage: "arrow.up.circle.fill") {
                         submitPhoto()
                     }
                     .buttonStyle(.borderedProminent)
-                    Button("移除", systemImage: "xmark") {
+                    Button(String(localized: "移除"), systemImage: "xmark") {
                         photoData = nil
                         selectedPhoto = nil
                         photoAnalysisID = UUID()
@@ -554,7 +554,7 @@ struct TourGuideView: View {
                     }
                 }
             }
-            Text(photoIsSubmitted ? (isAnalyzingPhoto ? "正在识别照片并准备讲解…" : "已根据照片生成讲解；不确定的细节请以现场资料为准。") : "点照片旁的“提交”发送给 AI 识别；底部箭头仅发送文字。")
+            Text(photoIsSubmitted ? (isAnalyzingPhoto ? String(localized: "正在识别照片并准备讲解…") : String(localized: "已根据照片生成讲解；不确定的细节请以现场资料为准。")) : String(localized: "点照片旁的“提交”发送给 AI 识别；底部箭头仅发送文字。"))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
@@ -568,11 +568,11 @@ struct TourGuideView: View {
         do {
             guard let data = try await item.loadTransferable(type: Data.self),
                   let image = UIImage(data: data) else {
-                photoError = "该照片格式暂不支持。"
+                photoError = String(localized: "该照片格式暂不支持。")
                 return
             }
             guard let prepared = preparedPhotoData(image) else {
-                photoError = "照片无法转换为可识别格式。"
+                photoError = String(localized: "照片无法转换为可识别格式。")
                 return
             }
             photoData = prepared
@@ -583,7 +583,7 @@ struct TourGuideView: View {
             messages = []
             photoPlayback.stop()
         } catch {
-            photoError = error.localizedDescription
+            photoError = PublicLanguage.errorDescription(error)
         }
     }
 
@@ -607,11 +607,11 @@ struct TourGuideView: View {
         let lengthInstruction: String
         switch selectedLength {
         case .short:
-            lengthInstruction = "30 秒讲解：最多 90 个汉字，只说最容易辨认的特征和一个最值得注意的细节。"
+            lengthInstruction = PublicLanguage.isChinese ? "30 秒讲解：最多 90 个汉字，只说最容易辨认的特征和一个最值得注意的细节。" : "30-second narration: at most 70 English words. Describe identifiable features and one notable detail."
         case .medium:
-            lengthInstruction = "2 分钟讲解：约 220 至 320 个汉字，依次说可见特征、最可能的地点或对象、值得观察的细节；事实不充分时不要为了凑长度编造。"
+            lengthInstruction = PublicLanguage.isChinese ? "2 分钟讲解：约 220 至 320 个汉字，依次说可见特征、最可能的地点或对象、值得观察的细节；事实不充分时不要为了凑长度编造。" : "2-minute narration: about 220–280 English words. Cover visible features, the likely place or object, and details to notice. Never invent facts to fill the duration."
         case .deep:
-            lengthInstruction = "深度讲解：最多 650 个汉字，分层说明外观、结构或材质、可能用途与参观观察点，明确区分照片可见事实和未经核实的推测；证据不足时可以简短。"
+            lengthInstruction = PublicLanguage.isChinese ? "深度讲解：最多 650 个汉字，分层说明外观、结构或材质、可能用途与参观观察点，明确区分照片可见事实和未经核实的推测；证据不足时可以简短。" : "In-depth narration: at most 650 English words. Explain appearance, structure or materials, possible uses and details to observe. Distinguish visible facts from unverified inference; stay brief if evidence is limited."
         }
         Task {
             do {
@@ -621,12 +621,12 @@ struct TourGuideView: View {
                     jpegData: data
                 )
                 guard photoAnalysisID == requestID else { return }
-                messages.removeAll { $0.text == "正在识别照片…" }
+                messages.removeAll { $0.text == String(localized: "正在识别照片…") }
                 messages.append(GuideMessage(isUser: false, text: response))
             } catch {
                 guard photoAnalysisID == requestID else { return }
-                messages.removeAll { $0.text == "正在识别照片…" }
-                messages.append(GuideMessage(isUser: false, text: "照片讲解暂不可用：\(error.localizedDescription)"))
+                messages.removeAll { $0.text == String(localized: "正在识别照片…") }
+                messages.append(GuideMessage(isUser: false, text: String(format: NSLocalizedString("照片讲解暂不可用：%@", comment: ""), String(describing: PublicLanguage.errorDescription(error)))))
             }
             if photoAnalysisID == requestID { isAnalyzingPhoto = false }
         }
@@ -656,13 +656,13 @@ struct TourGuideView: View {
             Task {
                 do {
                     let answer = try await GuideAIClient().complete(
-                        instructions: "你是谨慎的中文现场导游。只根据给出的地点信息和对话回答。没有外部核验的具体历史事实要坦诚说明不确定，不要编造。回答简短，可供继续追问。",
+                        instructions: "你是谨慎的现场导游。只根据给出的地点信息和对话回答。没有外部核验的具体历史事实要坦诚说明不确定，不要编造。回答简短，可供继续追问。",
                         input: "地点：\(selectedAttraction.name)，地址：\(selectedAttraction.address)。先前讲解：\(messages.first?.text ?? "")。用户问题：\(submitted)"
                     )
                     guard self.selectedAttraction?.id == selectedAttraction.id else { return }
                     messages.append(GuideMessage(isUser: false, text: answer))
                 } catch {
-                    messages.append(GuideMessage(isUser: false, text: "回答暂不可用：\(error.localizedDescription)"))
+                    messages.append(GuideMessage(isUser: false, text: String(format: NSLocalizedString("回答暂不可用：%@", comment: ""), String(describing: PublicLanguage.errorDescription(error)))))
                 }
             }
         } else {
@@ -675,8 +675,8 @@ struct TourGuideView: View {
         guard let photoData, !photoIsSubmitted else { return }
         isQuestionFocused = false
         photoIsSubmitted = true
-        subject = "照片讲解"
-        messages = [GuideMessage(isUser: false, text: "正在识别照片…")]
+        subject = String(localized: "照片讲解")
+        messages = [GuideMessage(isUser: false, text: String(localized: "正在识别照片…"))]
         analyzePhoto(photoData, question: "", requestID: photoAnalysisID)
     }
 
@@ -685,7 +685,7 @@ struct TourGuideView: View {
         photoPlayback.stop()
         let requestID = UUID()
         photoAnalysisID = requestID
-        messages = [GuideMessage(isUser: false, text: "正在识别照片…")]
+        messages = [GuideMessage(isUser: false, text: String(localized: "正在识别照片…"))]
         analyzePhoto(photoData, question: "", requestID: requestID)
     }
 
@@ -702,3 +702,23 @@ struct TourGuideView: View {
         question = ""
     }
 }
+#if DEBUG
+@MainActor
+enum PublicLocalizationQA {
+    static var screen: AnyView? {
+        let args = ProcessInfo.processInfo.arguments
+        guard let index = args.firstIndex(of: "-LocalizationQA"), args.indices.contains(index + 1) else { return nil }
+        let route = args[index + 1]
+        if route == "settings" { return AnyView(GuideSettingsView()) }
+        let item = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0)))
+        item.name = String(localized: "城市历史馆")
+        let attraction = GuideAttraction(id: "localization.demo", item: item, distance: 100,
+            reason: PublicDemo.notice, highlight: PublicDemo.notice)
+        return AnyView(NavigationStack {
+            AttractionDetailView(attraction: attraction, travelMode: .walking, currentLocation: nil,
+                messages: .constant([GuideMessage(isUser: false, text: MockGuideService.introduction(for: item.name!, length: .short))]),
+                length: .constant(.short), onAppear: {}, onDisappear: {}, onLengthChange: {})
+        })
+    }
+}
+#endif

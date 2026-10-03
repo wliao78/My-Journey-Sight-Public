@@ -48,7 +48,7 @@ struct GuideAttraction: Identifiable {
     let reason: String
     let highlight: String
 
-    var name: String { item.name ?? "未命名景点" }
+    var name: String { item.name ?? String(localized: "未命名景点") }
     var address: String { item.placemark.title ?? "" }
 }
 
@@ -57,6 +57,7 @@ enum GuideTravelMode: String, CaseIterable, Identifiable {
     case driving = "开车"
 
     var id: String { rawValue }
+    var title: String { NSLocalizedString(rawValue, comment: "Travel mode") }
     var directionsMode: String {
         self == .walking ? MKLaunchOptionsDirectionsModeWalking : MKLaunchOptionsDirectionsModeDriving
     }
@@ -109,7 +110,7 @@ struct AttractionService {
             "p\(index)|\(candidate.0.name ?? "")|\(candidate.0.pointOfInterestCategory?.rawValue ?? "")|\(Int(candidate.1))m"
         }.joined(separator: "\n")
         let output = try await ai.complete(
-            instructions: "你是谨慎的现场导游。只从提供的 Apple 地图候选中挑选最多 4 个有参观价值的景点。若用户提出搜索要求，必须优先严格满足类型、主题等要求；不符合的候选不能凑数。步行模式优先近处且适合步行到达的地点；开车模式可优先更远、值得专程去的地点。每行严格输出 p编号|一句简短中文推荐理由|一句该地点独有或明显区别于普通同类地点的具体特色。第三字段优先写可辨认的建筑外观、场馆主题或地形；禁止‘留意周边氛围’‘适合散步’‘看看展品’等任何地点都能套用的空话。不能确定特色时写‘暂缺可靠的特色资料’，不要编造历史、馆藏或设施。不得添加不存在的地点，不得声称已核验营业时间。没有合适候选可返回空文本。",
+            instructions: "你是谨慎的现场导游。只从提供的 Apple 地图候选中挑选最多 4 个有参观价值的景点。若用户提出搜索要求，必须优先严格满足类型、主题等要求；不符合的候选不能凑数。步行模式优先近处且适合步行到达的地点；开车模式可优先更远、值得专程去的地点。每行严格输出 p编号|一句简短的当前应用语言推荐理由|一句该地点独有或明显区别于普通同类地点的具体特色。第三字段优先写可辨认的建筑外观、场馆主题或地形；禁止‘留意周边氛围’‘适合散步’‘看看展品’等任何地点都能套用的空话。不能确定特色时写‘暂缺可靠的特色资料’，不要编造历史、馆藏或设施。不得添加不存在的地点，不得声称已核验营业时间。没有合适候选可返回空文本。",
             input: "用户要求：\(intent.mapQuery.isEmpty ? "自动推荐附近值得看的景点" : intent.mapQuery)。出行方式：\(mode.rawValue)。当前位置坐标：\(location.coordinate.latitude),\(location.coordinate.longitude)。候选：\n\(numbered)"
         )
         var seen: Set<Int> = []

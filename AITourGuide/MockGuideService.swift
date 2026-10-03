@@ -6,6 +6,7 @@ enum GuideLength: String, CaseIterable, Identifiable {
     case deep = "深度"
 
     var id: Self { self }
+    var title: String { NSLocalizedString(rawValue, comment: "Guide duration") }
 }
 
 enum MockGuideService {

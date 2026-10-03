@@ -56,7 +56,7 @@ struct GuideAIClient {
         }
         var body = body
         body["instructions"] = (body["instructions"] as? String ?? "") +
-            (Locale.current.language.languageCode?.identifier == "zh" ? "\n请用中文回答。" : "\nPlease respond in natural English.")
+            (PublicLanguage.isChinese ? "\n请用中文回答。" : "\nPlease respond in natural English.")
         let (data, response) = try await PublicAITransport.send(body: body, key: key, provider: provider, timeout: 60)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
             throw GuideAIError.http((response as? HTTPURLResponse)?.statusCode ?? 0)

@@ -9,7 +9,7 @@ final class GuideSpeechInputService: ObservableObject {
     @Published private(set) var errorMessage: String?
 
     private let engine = AVAudioEngine()
-    private let recognizer = SFSpeechRecognizer(locale: .current)
+    private let recognizer = SFSpeechRecognizer(locale: PublicLanguage.speechLocale)
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
 
@@ -19,16 +19,16 @@ final class GuideSpeechInputService: ObservableObject {
 
     private func start() async {
         guard recognizer?.isAvailable == true else {
-            errorMessage = "当前设备暂不支持语音识别。"
+            errorMessage = String(localized: "当前设备暂不支持语音识别。")
             return
         }
         let speechAllowed = await Self.requestSpeechAuthorization()
         guard speechAllowed else {
-            errorMessage = "请在系统设置中允许语音识别。"
+            errorMessage = String(localized: "请在系统设置中允许语音识别。")
             return
         }
         guard await AVAudioApplication.requestRecordPermission() else {
-            errorMessage = "请在系统设置中允许使用麦克风。"
+            errorMessage = String(localized: "请在系统设置中允许使用麦克风。")
             return
         }
 
@@ -53,7 +53,7 @@ final class GuideSpeechInputService: ObservableObject {
                 task = Self.makeTask(recognizer: recognizer, request: newRequest, owner: self)
             }
         } catch {
-            errorMessage = "语音输入未能启动：\(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("语音输入未能启动：%@", comment: ""), String(describing: PublicLanguage.errorDescription(error)))
             stop()
         }
     }

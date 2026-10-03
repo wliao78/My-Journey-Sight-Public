@@ -4,8 +4,13 @@ import SwiftUI
 struct AITourGuideApp: App {
     var body: some Scene {
         WindowGroup {
-            TourGuideView()
+            Group {
+#if DEBUG
+                if let preview = PublicLocalizationQA.screen { preview } else { TourGuideView() }
+#else
+                TourGuideView()
+#endif
+            }.environment(\.locale, PublicLanguage.locale)
         }
     }
 }
-
