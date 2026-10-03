@@ -54,6 +54,10 @@ struct AttractionDetailView: View {
                 .padding(14)
                 .sightPanel(radius: 14)
 
+                if PublicDemo.enabled {
+                    Label(PublicDemo.notice, systemImage: "wifi.slash")
+                        .padding().frame(maxWidth: .infinity)
+                } else {
                 Map(initialPosition: .region(MKCoordinateRegion(
                     center: attraction.item.placemark.coordinate,
                     latitudinalMeters: 1_400,
@@ -76,6 +80,8 @@ struct AttractionDetailView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+
+                }
 
                 HStack {
                     Text("AI 讲解")

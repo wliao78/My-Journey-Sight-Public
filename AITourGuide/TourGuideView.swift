@@ -1,3 +1,4 @@
+import MapKit
 import PhotosUI
 import SwiftUI
 
@@ -48,6 +49,7 @@ struct TourGuideView: View {
                 if !transcript.isEmpty { question = transcript }
             }
             .task {
+                if PublicDemo.enabled { await refreshAttractions(); return }
                 guard locationService.location == nil else { return }
                 if !didOfferKeySetup && APIKeyStore().load() == nil {
                     didOfferKeySetup = true
@@ -65,6 +67,7 @@ struct TourGuideView: View {
                 Task { await refreshWeather() }
             }
             .sheet(isPresented: $showingSettings, onDismiss: {
+                if PublicDemo.enabled { Task { await refreshAttractions() }; return }
                 if locationService.location == nil {
                     locationService.request()
                 } else if attractions.isEmpty, APIKeyStore().load() != nil {
@@ -177,13 +180,13 @@ struct TourGuideView: View {
             HStack(spacing: 8) {
                 Image(systemName: "location.fill")
                     .foregroundStyle(SightTheme.accent)
-                Text(locationService.placeName)
+                Text(PublicDemo.enabled ? PublicDemo.title : locationService.placeName)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .layoutPriority(1)
                 Spacer(minLength: 4)
                 Image(systemName: weather.symbol)
-                Text(weather.summary)
+                Text(PublicDemo.enabled ? "" : weather.summary)
                     .font(.caption)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -213,6 +216,7 @@ struct TourGuideView: View {
 
     @MainActor
     private func refreshWeather() async {
+        guard !PublicDemo.enabled else { return }
         guard let location = locationService.location else { return }
         weather = (try? await GuideWeatherService().current(at: location)) ?? .unavailable
     }
@@ -415,7 +419,7 @@ struct TourGuideView: View {
                                     .font(.headline)
                                     .lineLimit(1)
                                 Spacer()
-                                Text("\(Int(attraction.distance)) 米")
+                                Text(PublicDemo.enabled ? PublicDemo.title : "\(Int(attraction.distance)) 米")
                                     .font(.caption.bold())
                                     .foregroundStyle(.secondary)
                             }
@@ -440,6 +444,19 @@ struct TourGuideView: View {
 
     @MainActor
     private func refreshAttractions(force: Bool = false) async {
+        if PublicDemo.enabled {
+            let names = ["城市历史馆", "海滨步道", "街区公园", "艺术展厅", "老城街区", "观景花园"]
+            attractions = names.enumerated().map { index, name in
+                let item = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0)))
+                item.name = NSLocalizedString(name, comment: "Fictional demo attraction")
+                return GuideAttraction(id: "demo.sight.\(index)", item: item, distance: 0,
+                    reason: PublicDemo.notice,
+                    highlight: String(localized: "留意建筑、空间与周围的生活细节；这是虚构场景，不代表真实地点。"))
+            }
+            recommendationsByMode[travelMode] = attractions
+            attractionStatus = PublicDemo.notice
+            return
+        }
         guard !loadingAttractions, let location = locationService.location else { return }
         guard APIKeyStore().load() != nil else {
             attractionStatus = "请先在设置中填写 API Key。"
@@ -485,6 +502,10 @@ struct TourGuideView: View {
 
     @MainActor
     private func explain(_ attraction: GuideAttraction) async {
+        if PublicDemo.enabled {
+            messages = [GuideMessage(isUser: false, text: PublicDemo.notice + "\n" + attraction.highlight)]
+            return
+        }
         messages = [GuideMessage(isUser: false, text: "正在准备讲解…")]
         do {
             let output = try await GuideAIClient().complete(
@@ -612,6 +633,7 @@ struct TourGuideView: View {
     }
 
     private func sendQuestion() {
+        if PublicDemo.enabled { speech.stop(); isQuestionFocused = false; attractionStatus = String(localized: "演示模式不会处理你的输入，请关闭演示模式以获取真实 AI 结果。"); return }
         let submitted = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !submitted.isEmpty else { return }
         if speech.isListening { speech.stop() }
@@ -649,6 +671,7 @@ struct TourGuideView: View {
     }
 
     private func submitPhoto() {
+        if PublicDemo.enabled { photoError = String(localized: "演示模式不会处理你的输入，请关闭演示模式以获取真实 AI 结果。"); return }
         guard let photoData, !photoIsSubmitted else { return }
         isQuestionFocused = false
         photoIsSubmitted = true

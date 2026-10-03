@@ -39,6 +39,7 @@ struct GuideSettingsView: View {
                         }
                     }
                     .onChange(of: providerID) { _, _ in aiConsent = PublicAIConsent.granted }
+                    PublicAIConfigurationView(provider: selectedProvider)
                     SecureField("在此粘贴 API Key", text: $key)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -74,6 +75,12 @@ struct GuideSettingsView: View {
                 Section {
                     Text(status.isEmpty ? "密钥仅存在本设备钥匙串，不写入项目文件。" : status)
                         .foregroundStyle(.secondary)
+                }
+                .listRowBackground(SightTheme.panel)
+                Section("隐私与支持") {
+                    Link("隐私政策", destination: URL(string: "https://wliao78.github.io/My-Journey-Support/#privacy-" + (Locale.current.language.languageCode?.identifier == "zh" ? "zh" : "en"))!)
+                    Link("使用支持", destination: URL(string: "https://wliao78.github.io/My-Journey-Support/#support")!)
+                    Link("联系开发者", destination: URL(string: "mailto:tinyworm@gmail.com")!)
                 }
                 .listRowBackground(SightTheme.panel)
             }

@@ -23,14 +23,14 @@ Description:
 • 语音播放与地图导航入口
 • 未配置 AI 时可体验明确标注的演示内容
 
-使用方法：允许定位后浏览附近地点；如需 AI 讲解，在设置中选择 OpenAI、Anthropic Claude 或 Google Gemini，输入自己的 API Key，并阅读及同意照片、位置等信息发送给所选服务商的说明。API 使用可能由服务商收费。
+使用方法：允许定位后浏览附近地点；如需 AI 讲解，在设置中选择 OpenAI、Claude、Gemini、DeepSeek、通义千问、Kimi、智谱、豆包或文心，输入自己的 API Key，并阅读及同意照片、位置等信息发送给所选服务商的说明。API 使用可能由服务商收费。
 
 请注意：AI 可能误认照片中的地点、年代或事实；博物馆、景区开放时间与交通条件也可能变化。重要信息请以现场标示和官方来源为准。演示内容是示例，不是实时推荐。
 
 ## en-US
 
 Name: My Journey Sight
-Subtitle: Discover the story behind a place
+Subtitle: Every place has a story
 Promotional text: Find interesting places nearby, or ask about a photo. Choose a 30-second, two-minute, or in-depth explanation and listen as you explore.
 Keywords: travel guide,nearby sights,photo guide,audio guide,walking,road trip,landmarks,maps
 
@@ -48,9 +48,16 @@ Highlights:
 • Spoken playback and map handoff
 • Clearly labeled sample content before connecting AI
 
-Getting started: Allow location access to explore nearby places. For AI explanations, choose OpenAI, Anthropic Claude, or Google Gemini in Settings, enter your own API key, and review and accept the disclosure about sharing photos, location, and related request details with your chosen provider. API usage may incur provider charges.
+Getting started: Allow location access to explore nearby places. For AI explanations, choose OpenAI, Claude, Gemini, DeepSeek, Qwen, Kimi, GLM, Doubao, or ERNIE in Settings, enter your own API key, and review and accept the disclosure about sharing photos, location, and related request details with your chosen provider. API usage may incur provider charges.
 
 Important: AI can misidentify a place or get historical details wrong. Hours, access, and travel conditions can change. Confirm important facts on site or with official sources. Sample content is illustrative, not a live recommendation.
+
+## Release links
+
+Support URL: https://wliao78.github.io/My-Journey-Support/#support
+Privacy URL (zh-Hans): https://wliao78.github.io/My-Journey-Support/#privacy-zh
+Privacy URL (en-US): https://wliao78.github.io/My-Journey-Support/#privacy-en
+Contact email: tinyworm@gmail.com
 
 ## Screenshot plan
 

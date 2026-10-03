@@ -1,0 +1,16 @@
+See a place. Then understand why it matters.
+
+My Journey Sight helps you explore landmarks, neighborhoods, and small details along the way. Browse nearby suggestions, inspect the location and route, or take a photo and ask for an explanation of what caught your eye.
+
+Choose a quick 30-second introduction, a two-minute story, or a deeper explanation. Listen with spoken playback while you walk. Walking and driving modes adapt discovery to the way you are traveling, and the interface follows your iPhone language in English or Simplified Chinese.
+
+Highlights:
+• Nearby place discovery
+• Walking and driving modes
+• Photo-based questions and three explanation lengths
+• Spoken playback and map handoff
+• Clearly labeled sample content before connecting AI
+
+Getting started: Allow location access to explore nearby places. For AI explanations, choose OpenAI, Claude, Gemini, DeepSeek, Qwen, Kimi, GLM, Doubao, or ERNIE in Settings, enter your own API key, and review and accept the disclosure about sharing photos, location, and related request details with your chosen provider. API usage may incur provider charges.
+
+Important: AI can misidentify a place or get historical details wrong. Hours, access, and travel conditions can change. Confirm important facts on site or with official sources. Sample content is illustrative, not a live recommendation.

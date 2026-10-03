@@ -17,6 +17,7 @@ final class GuideLocationService: NSObject, ObservableObject, @preconcurrency CL
     }
 
     func request() {
+        guard !PublicDemo.enabled else { return }
         switch manager.authorizationStatus {
         case .notDetermined: manager.requestWhenInUseAuthorization()
         case .authorizedAlways, .authorizedWhenInUse: manager.startUpdatingLocation()
@@ -26,12 +27,14 @@ final class GuideLocationService: NSObject, ObservableObject, @preconcurrency CL
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        guard !PublicDemo.enabled else { return }
         if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
             manager.startUpdatingLocation()
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard !PublicDemo.enabled else { return }
         guard location == nil else { return }
         guard let latest = locations.last else { return }
         manager.stopUpdatingLocation()
